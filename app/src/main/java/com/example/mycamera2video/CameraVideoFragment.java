@@ -79,6 +79,9 @@ public class CameraVideoFragment extends Fragment
     private static final int REQUEST_VIDEO_PERMISSIONS = 1;
     private static final String FRAGMENT_DIALOG = "dialog";
 
+    public static final String CAMERA_FRONT = "1";
+    public static final String CAMERA_BACK = "0";
+
     private static final String[] VIDEO_PERMISSIONS = {
             Manifest.permission.CAMERA,
             Manifest.permission.RECORD_AUDIO,
@@ -221,6 +224,7 @@ public class CameraVideoFragment extends Fragment
     private Integer mSensorOrientation;
     private String mNextVideoAbsolutePath;
     private CaptureRequest.Builder mPreviewBuilder;
+    private String cameraId;
 
     public static CameraVideoFragment newInstance() {
         return new CameraVideoFragment();
@@ -319,13 +323,25 @@ public class CameraVideoFragment extends Fragment
                 break;
             }
             case R.id.info: {
-                Activity activity = getActivity();
+
+                if (cameraId.equals(CAMERA_FRONT)){
+
+                    cameraId = CAMERA_BACK;
+                    closeCamera();
+                    reopencamera();
+                }else {
+                    cameraId = CAMERA_FRONT;
+                    closeCamera();
+                    reopencamera();
+                }
+
+               /* Activity activity = getActivity();
                 if (null != activity) {
                     new AlertDialog.Builder(activity)
                             .setMessage(R.string.intro_message)
                             .setPositiveButton(android.R.string.ok, null)
                             .show();
-                }
+                } */
                 break;
             }
         }
@@ -648,6 +664,17 @@ public class CameraVideoFragment extends Fragment
         }
         mNextVideoAbsolutePath = null;
         startPreview();
+    }
+
+    public void reopencamera(){
+
+        if (mTextureView.isAvailable()) {
+            openCamera(mTextureView.getWidth(),mTextureView.getHeight());
+        } else {
+            mTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
+        }
+
+
     }
 
     /**
